@@ -2,7 +2,8 @@ pipeline {
     agent {
         dockerfile {
             // args '-p 4444:4444 --name="node_v1" --net="vnoveprod_app-net" -v /var/www/memowiki_prod:/usr/src/app'
-            args '-p 4444:4444 --name="react_v1" --net="vnoveprod_app-net"'
+            // Using -td prevent container from stop
+            args '-td -p 4444:4444 --name="react_v1" --net="vnoveprod_app-net"'
         }
 //        docker {
 //            image 'node:6-alpine'
