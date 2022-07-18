@@ -42,7 +42,7 @@ FROM nginx:1.23.0-alpine
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/nginx.conf /etc/nginx/conf.d
-# EXPOSE 4444
+EXPOSE 80
 # ENTRYPOINT ["nginx", "-g", "daemon off;"]
 # CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 # CMD ["nginx", "-g", "daemon off;"]
