@@ -14,8 +14,9 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 # • COPY --chown=node:node . /usr/src/app
 
 # it works if file in the same folder as Dockerfile
-COPY --chown=node:node ./package.json .
-COPY --chown=node:node ./package-lock.json .
+# COPY --chown=node:node ./package.json .
+COPY ./package.json /usr/src/app
+COPY ./package-lock.json /usr/src/app
 
 # Optimize Node.js apps for production
 # Some Node.js libraries and frameworks will only enable
@@ -29,7 +30,7 @@ ENV NODE_ENV production
 RUN npm install
 
 # When you use COPY it will copy the files from the local source, in this case . meaning the files in the current directory, to the location defined by WORKDIR. In the above example, the second . refers to the current directory in the working directory within the image.
-COPY --chown=node:node . .
+COPY . /usr/src/app
 
 RUN npm run build
 # Only locally, on prod we use Jenkins for that.
@@ -39,6 +40,7 @@ RUN npm run build
 
 # stage 2 - build the final image and copy the react build files
 FROM nginx:1.23.0-alpine
+WORKDIR /usr/share/nginx/html
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/nginx.conf /etc/nginx/conf.d
@@ -47,3 +49,5 @@ EXPOSE 80
 # CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 CMD ["nginx", "-g", "daemon off;"]
 # CMD ["nginx"]
+
+
