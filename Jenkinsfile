@@ -1,45 +1,27 @@
 pipeline {
-    agent {
-        dockerfile {
-            // args '-p 4444:4444 --name="node_v1" --net="vnoveprod_app-net" -v /var/www/memowiki_prod:/usr/src/app'
-            // Using -td prevent container from stop
-            args '-td -p 4444:80 --name="react_v1" --net="vnoveprod_app-net"'
-        }
-//        docker {
-//            image 'node:6-alpine'
-//            args '-p 4444:4444 --name="node_v1" --net="vnoveprod_app-net"'
-//            // Error: docker: Error response from daemon: network app-net not found.
-//            //args '-p 4444:3000 --name="node_v1" --network="app-net"'
-//        }
-    }
-    environment {
-        MEMOWIKI_COMMON_CREDS = credentials('memowiki-test-user-pass')
-    }
+    agent any
     stages {
-        stage('env') {
+        stage('Environment') {
             steps {
-                sh 'id'
-//                 sh 'whoami'
-//                 sh 'pwd'
-//                 sh 'printenv'
+                sh 'git --version'
+                echo "Branch: ${env.BRANCH_NAME}"
+                sh 'docker -v'
+                sh 'printenv'
             }
         }
         stage('Build') {
             steps {
-                //sh 'docker network connect app-net node_v1'
-                // sh 'id'
-//                 sh 'whoami'
-                sh 'pwd'
-                // sh 'npm install'
+                sh 'docker build -t react_v1 -f Dockerfile --no-cache .'
+                sh 'docker stop react_v1 || true && docker rm react_v1 || true'
+                sh 'ls -la /var/jenkins_home/workspace/simple-node-js-react-npm-app/build'
+                sh 'ls -la ./'
+                sh 'docker run -d -it -p 4444:80 --net=vnoveprod_app-net --name=react_v1 react_v1'
             }
         }
         stage('Deliver') {
             steps {
                 sh 'pwd'
                 input 'Does the staging environment look ok?'
-                // sh './jenkins/scripts/deliver.sh'
-                // input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                // sh './jenkins/scripts/kill.sh'
             }
         }
     }
