@@ -9,7 +9,14 @@ pipeline {
                 sh 'printenv'
             }
         }
-        stage('Build') {
+        stage ('Build API') {
+            steps {
+                build job: 'memowiki-expressjs-test', parameters: [
+                    string(name: 'param1', value: "value1")
+                ]
+            }
+        }
+        stage('Build React') {
             steps {
                 sh 'docker build -t react_v1 -f Dockerfile --no-cache .'
                 sh 'docker stop react_v1 || true && docker rm react_v1 || true'
